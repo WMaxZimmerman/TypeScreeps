@@ -3,7 +3,7 @@ import { roleUpgrader } from "./role.upgrader";
 import { roleBuilder } from "./role.builder";
 import { roleFighter } from "./role.fighter";
 
-export class RoomManager {
+export class OldRoomManager {
 
     manageRoom(room: Room) {
         //Setup the memory object for the room if it isn't set.

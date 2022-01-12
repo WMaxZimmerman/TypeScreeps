@@ -1,4 +1,4 @@
-import { RoomManager } from "./room.manager";
+import { OldRoomManager } from "room.manager";
 
 export const autospawn = function(spawn: StructureSpawn) {
     if (spawn.spawning) {
@@ -24,7 +24,7 @@ export const autospawn = function(spawn: StructureSpawn) {
     // if (workerLvl >= 4) workerBody = [WORK,CARRY,MOVE,WORK,CARRY,MOVE,WORK,CARRY,MOVE,WORK,CARRY,MOVE];
     // if (workerLvl >= 5) workerBody = [WORK,CARRY,MOVE,WORK,CARRY,MOVE,WORK,CARRY,MOVE,WORK,CARRY,MOVE,WORK,CARRY,MOVE];
 
-    const roomManager = new RoomManager();
+    const roomManager = new OldRoomManager();
     if (harvesters.length < roleCap && spawn.room.energyAvailable >= workerCost) {
         roomManager.spawnWorker(spawn, "harvester", workerLvl);
     } else if (upgraders.length < roleCap && spawn.room.energyAvailable >= workerCost) {
