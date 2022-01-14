@@ -1,22 +1,21 @@
-import { autospawn } from "auto.spawner";
-import { constructionManager } from "construction.manager";
-import { eventHandler } from "event.handler";
+import { ConstructionManager } from "managers/construction-manager";
+import { EventManager } from "managers/event-manager";
+import { ExpansionManager } from "managers/expansion-manager";
 import { MemoryManager } from "managers/memory-manager";
-import { RoomManager } from "room.manager";
+import { RoomManager } from "managers/room-manager";
+import { KingdomMemory } from "models/kingdom";
 
 export class Kingdom {
     private constructor() { }
-
-    public static run(): void {
-        
-    }
     
-    public static oldRun(): void {
+    public static run(): void {
+        if (!Memory.kingdom) {
+            Memory.kingdom = new KingdomMemory(false);
+        }
+        
         console.log(`==== Current game tick is ${Game.time} ====`);
         MemoryManager.cleanMemory();
-
-        let eventHndlr = new eventHandler();
-        let constuctionMngr = new constructionManager();
+        
         //Temporary cleanup of roads
         // for (var index in Game.constructionSites) {
         //     var cs = Game.constructionSites[index];
@@ -32,7 +31,8 @@ export class Kingdom {
         //     }
         // }
 
-        eventHndlr.creepCountChanged();
+        EventManager.creepCountChanged();
+        ExpansionManager.manage();
 
         for (let roomName in Game.rooms) {
             let room: Room = Game.rooms[roomName];
@@ -40,13 +40,13 @@ export class Kingdom {
                 let owner = room.controller?.owner;
                 if (owner != undefined && owner != null) {
                     if (room != undefined && room.controller?.owner?.username == "SmileyFace") {
-                        eventHndlr.rclUpgrade(room);
+                        EventManager.rclUpgrade(room);
                     }
                 }
             }
         }
 
-        constuctionMngr.setPrioritySite();
+        ConstructionManager.setPrioritySite();
 
         for (let structureId in Game.structures) {
             let structure = Game.structures[structureId];

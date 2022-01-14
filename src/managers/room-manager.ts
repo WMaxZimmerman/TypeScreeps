@@ -18,7 +18,9 @@ export class RoomManager {
 
         for (const name in Game.creeps) {
             const creep = Game.creeps[name];
-            CreepManager.manage(creep);
+            if (creep.memory.room == room.name && creep.memory.class != "kingsown") {
+                CreepManager.manage(creep);
+            }
         }
 
         const controller = room.controller;

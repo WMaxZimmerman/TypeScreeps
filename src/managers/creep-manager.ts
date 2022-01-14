@@ -50,7 +50,7 @@ export class CreepManager {
             }
         }
 
-        if (creep.memory.militaryRole)
+        if (creep.memory.militaryRole && creep.memory.class != "kingsown")
         {
             SoldierManager.manage(creep);
         }
@@ -122,26 +122,18 @@ export class CreepManager {
         if (creep.memory.isHarvesting == undefined) creep.memory.isHarvesting = creep.carry.energy < creep.carryCapacity;
 
         if (creep.carry[RESOURCE_ENERGY] < creep.carryCapacity && creep.memory.isHarvesting == true) {
-            let source = creep.pos.findClosestByPath(FIND_SOURCES, {
+            const source = creep.pos.findClosestByPath(FIND_SOURCES, {
                 filter: (s) => {
                     return s.energy > 0;
                 }, algorithm: 'astar'
             });
-
-            if (source == null) {
-                source = creep.pos.findClosestByPath(FIND_SOURCES, {
-                    filter: (s) => {
-                        return s.energy > 0;
-                    }, algorithm: 'astar'
-                });
-            }
 
             this.moveTowardTarget(creep, source, CreepAction.harvest);
         }
         else {
             if (creep.carry[RESOURCE_ENERGY] == creep.carryCapacity) creep.memory.isHarvesting = false;
 
-            var target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+            let target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                 filter: (structure: any) => {
                     return (structure.structureType == STRUCTURE_EXTENSION ||
                         structure.structureType == STRUCTURE_SPAWN ||
@@ -151,7 +143,7 @@ export class CreepManager {
                 }, algorithm: 'astar'
             });
 
-            if (target == null) {
+            if (target == null || target == undefined) {
                 target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                     filter: (structure) => {
                         return (structure.structureType == STRUCTURE_CONTAINER) &&
@@ -213,24 +205,45 @@ export class CreepManager {
     private static moveTowardTarget(creep: Creep, target: any, action: CreepAction) {
         //creep.say('move');
         let actionCode;
-        switch (action) {
-            case CreepAction.upgrade: {
-                actionCode = creep.upgradeController(target);
-            }
-            case CreepAction.harvest: {
-                actionCode = creep.harvest(target);
-            }
-            case CreepAction.transfer: {
-                actionCode = creep.transfer(target, RESOURCE_ENERGY);
-            }
-            case CreepAction.repair: {
-                actionCode = creep.repair(target);
-            }
+        // switch (action) {
+        //     case CreepAction.upgrade: {
+        //         console.log("upgrading");
+        //         actionCode = creep.upgradeController(target);
+        //     }
+        //     case CreepAction.harvest: {
+        //         console.log("harvesting");
+        //         actionCode = creep.harvest(target);
+        //     }
+        //     case CreepAction.transfer: {
+        //         console.log("transfering");
+        //         actionCode = creep.transfer(target, RESOURCE_ENERGY);
+        //     }
+        //     case CreepAction.repair: {
+        //         console.log("repairing");
+        //         actionCode = creep.repair(target);
+        //     }
+        // }
+
+        if (action == CreepAction.upgrade) {
+            console.log("upgrading");
+            actionCode = creep.upgradeController(target);
+        } else if (action == CreepAction.harvest) {
+            console.log("harvesting");
+            actionCode = creep.harvest(target);
+        } else if (action == CreepAction.transfer) {
+            console.log("transfering");
+            actionCode = creep.transfer(target, RESOURCE_ENERGY);
+        } else if (action == CreepAction.repair) {
+            console.log("repairing");
+            actionCode = creep.repair(target);
+        } else if (action == CreepAction.build) {
+            console.log("building");
+            actionCode = creep.build(target);
         }
 
         //creep.say(actionCode);
         console.log("action '" + action + "' has status of '" + actionCode + "'");
-        //console.log(JSON.stringify(target));
+        console.log(JSON.stringify(target));
         if (target != null && actionCode == ERR_NOT_IN_RANGE) {
             let moveCode = creep.moveTo(target, { visualizePathStyle: { stroke: '#ffaa00' }, ignoreRoads: true, swampCost: 1, plainCost: 1 });
             if (moveCode == ERR_NO_PATH) {

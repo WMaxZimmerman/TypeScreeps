@@ -31,5 +31,17 @@ export const autospawn = function(spawn: StructureSpawn) {
         roomManager.spawnWorker(spawn, "upgrader", workerLvl);
     } else if (builders.length < roleCap && spawn.room.energyAvailable >= workerCost) {
         roomManager.spawnWorker(spawn, "builder", workerLvl);
+    } else if (spawn.room.energyAvailable >= 800 && Memory.kingdom.claimerNeeded) { //&& harvesters.length > 3 && upgraders.length > 2 && builders.length > 2 && Game.gcl >= 3) {
+        var newName = 'Kingsown_Claimer_' + Game.time;
+        console.log('Spawning new claimer: ' + newName);
+        Memory.kingdom.claimerNeeded = false;
+        const claimFlag = Game.flags['Claim'];
+        spawn.spawnCreep([MOVE, MOVE, MOVE, MOVE,CLAIM], newName,{memory: {
+            class: 'kingsown',
+            role: 'claimer',
+            room: claimFlag.room?.name ?? spawn.room.name,
+            working: false,
+            target: claimFlag.pos
+        }});
     }
 }

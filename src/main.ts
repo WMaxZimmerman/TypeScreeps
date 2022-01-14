@@ -1,5 +1,6 @@
 import { MilitaryRole } from "enums/military-roles";
 import { Kingdom } from "kingdom";
+import { KingdomMemory } from "models/kingdom";
 import { ErrorMapper } from "utils/ErrorMapper";
 
 declare global {
@@ -18,6 +19,7 @@ declare global {
         sites: any[];
         currentCreepCount: number;
         prioritySite?: ConstructionSite<BuildableStructureConstant>;
+        kingdom: KingdomMemory;
     }
 
     interface RoomMemory {
@@ -35,6 +37,7 @@ declare global {
         isUpgrading?: boolean;
         isBuilding?: boolean;
         militaryRole?: MilitaryRole;
+        target?: RoomPosition;
     }
 
     // Syntax for adding proprties to `global` (ex "global.log")
@@ -48,5 +51,5 @@ declare global {
 // When compiling TS to JS and bundling with rollup, the line numbers and file names in error messages change
 // This utility uses source maps to get the line numbers and file names of the original, TS source code
 export const loop = ErrorMapper.wrapLoop(() => {
-    Kingdom.oldRun();
+    Kingdom.run();
 });

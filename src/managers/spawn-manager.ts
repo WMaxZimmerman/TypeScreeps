@@ -33,19 +33,21 @@ export class SpawnManager {
             this.spawnWorker(spawn, "upgrader", workerLvl);
         } else if (builders.length < roleCap && spawn.room.energyAvailable >= workerCost) {
             this.spawnWorker(spawn, "builder", workerLvl);
-        } else if(repairmen.length < roleCap && spawn.room.energyAvailable >= workerCost) {
-            // var newName = 'Repairman' + Game.time;
-            // console.log('Spawning new repairman: ' + newName);
-            // spawn.spawnCreep([WORK,CARRY,MOVE,WORK,CARRY,MOVE,WORK,CARRY,MOVE], newName, {memory: {role: 'repairman'}});
-        } else if(fighters.length < roleCap / 2 && spawn.room.energyAvailable >= 800) { //&& harvesters.length > 3 && upgraders.length > 2 && builders.length > 2 && Game.gcl >= 3) {
-            const newName = 'Fighter' + Game.time;
-            console.log('Spawning new fighter: ' + newName);
-            spawn.spawnCreep([MOVE, WORK, CARRY,CLAIM], newName,{memory: {
-                class: 'fighter',
-                role: 'claimer',
-                room: spawn.room.name,
-                working: false
-            }});
+        } else if(spawn.room.energyAvailable >= 800 && Memory.kingdom.claimerNeeded) { //&& harvesters.length > 3 && upgraders.length > 2 && builders.length > 2 && Game.gcl >= 3) {
+            const newName = 'Kingsown_Claimer_' + Game.time;
+            console.log('Spawning new claimer: ' + newName);
+            Memory.kingdom.claimerNeeded = false;
+            const claimFlag = Game.flags['Claim'];
+            spawn.spawnCreep([MOVE, MOVE, MOVE, MOVE, CLAIM], newName, {
+                memory: {
+                    class: 'kingsown',
+                    role: 'claimer',
+                    room: claimFlag.room?.name ?? spawn.room.name,
+                    working: false,
+                    target: claimFlag.pos
+                }
+            });
+            claimFlag.remove();
         }
         // else if (spawn.room.energyAvailable >= workerCost && harvesters.length < roleCap) {
         //     var newName = 'Harvester' + Game.time;
@@ -56,27 +58,38 @@ export class SpawnManager {
     }
 
     private static spawnWorker(spawn: StructureSpawn, role: string, workerLvl: number): void {
-        function getWorkerBody(workerLvl: number): BodyPartConstant[] {
-            var body: BodyPartConstant[] = [];
-
-            for (var i = 0; i < workerLvl; i++) {
-                if (body.length >= 47) break; //Max amount of body parts is 50
-                body.push(WORK);
-                body.push(CARRY);
-                body.push(MOVE);
-            }
-
-            return body;
-        }
-
-        let workerBody = getWorkerBody(workerLvl);
-        let workerName = 'Worker_' + workerLvl + '_' + Game.time;
+        const workerBody = this.getWorkerBody(workerLvl, spawn.room);
+        const workerName = 'Worker_' + workerLvl + '_' + Game.time;
+        
         console.log('Spawning new Worker: ' + workerName + ' (' + role + ')');
+        
         spawn.spawnCreep(workerBody, workerName, { memory: {
             class: 'worker',
             role: role,
             room: spawn.room.name,
             working: false
         } });
+    }
+
+    private static getWorkerBody(workerLvl: number, room: Room): BodyPartConstant[] {
+        const capacity = room.energyCapacityAvailable;
+        if (capacity < 200) return [];
+        //const lvl = capacity % 100;
+        // let workerBody = [WORK, CARRY, CARRY, CARRY, MOVE];
+        // if (workerLvl >= 2) workerBody = [WORK, CARRY, CARRY, CARRY, MOVE, WORK, CARRY, CARRY, MOVE];
+        // if (workerLvl >= 3) workerBody = [WORK,CARRY,MOVE,WORK,CARRY,MOVE,WORK,CARRY,MOVE];
+        // if (workerLvl >= 4) workerBody = [WORK,CARRY,MOVE,WORK,CARRY,MOVE,WORK,CARRY,MOVE,WORK,CARRY,MOVE];
+        // if (workerLvl >= 5) workerBody = [WORK,CARRY,MOVE,WORK,CARRY,MOVE,WORK,CARRY,MOVE,WORK,CARRY,MOVE,WORK,CARRY,MOVE];
+
+        const body: BodyPartConstant[] = [];
+
+        for (var i = 0; i < workerLvl; i++) {
+            if (body.length >= 47) break; //Max amount of body parts is 50
+            body.push(WORK);
+            body.push(CARRY);
+            body.push(MOVE);
+        }
+
+        return body;
     }
 }

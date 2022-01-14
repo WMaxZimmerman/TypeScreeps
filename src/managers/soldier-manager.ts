@@ -11,9 +11,6 @@ export class SoldierManager {
             case MilitaryRole.guard: {
                 this.guard(creep);
             }
-            case MilitaryRole.claimer: {
-                this.claim(creep);
-            }
             case MilitaryRole.invader: {
                 this.invade(creep);
             }
@@ -36,28 +33,6 @@ export class SoldierManager {
                 creep.moveTo(closestEnemy, { visualizePathStyle: { stroke: '#ba2807' } });
             }
         }
-    }
-
-    private static claim(creep: Creep): void {
-        const flag: Flag = Game.flags['Claim'];
-        const targetRoom = flag.pos.roomName;
-        console.log(JSON.stringify(targetRoom));
-        if (targetRoom != undefined && targetRoom != null) {
-            if (creep.room.name != targetRoom) {
-                console.log(creep.room.name);
-                creep.moveTo(flag);
-            } else {
-                const controller = creep.room.controller;
-                if (!controller) return;
-                const claimCode = creep.claimController(controller);
-                if (claimCode == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(controller);
-                } else if (claimCode != 0) {
-                    creep.say(claimCode.toString());
-                }
-            }
-        }
-
     }
 
     private static invade(creep: Creep): void {
