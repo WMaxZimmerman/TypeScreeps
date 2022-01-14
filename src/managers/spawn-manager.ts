@@ -1,3 +1,5 @@
+import { MilitaryRole } from "enums/military-roles";
+
 export class SpawnManager {
     private constructor() { }
 
@@ -48,6 +50,20 @@ export class SpawnManager {
                 }
             });
             claimFlag.remove();
+        } else if (Memory.kingdom.roomInNeedOfAide && spawn.room.energyAvailable >= workerCost) {
+            const aideLvl = workerLvl > 1 ? (workerLvl - 1) : workerLvl;
+            this.spawnWorker(spawn, "builder", aideLvl, Memory.kingdom.roomInNeedOfAide);
+            Memory.kingdom.roomInNeedOfAide = undefined;
+        } else if (Memory.kingdom.invadersNeeded && spawn.room.energyAvailable >= 300) {
+            const newName = 'Fighter_' + Game.time;
+            console.log('Spawning new fighter: ' + newName);
+            spawn.spawnCreep([MOVE, MOVE, MOVE, RANGED_ATTACK], newName,{memory: {
+                class: 'kingsown',
+                room: Memory.kingdom.invadersNeeded,
+                working: false,
+                militaryRole: MilitaryRole.invader,
+                role: 'invader'
+            }});
         }
         // else if (spawn.room.energyAvailable >= workerCost && harvesters.length < roleCap) {
         //     var newName = 'Harvester' + Game.time;
@@ -57,16 +73,17 @@ export class SpawnManager {
         // }
     }
 
-    private static spawnWorker(spawn: StructureSpawn, role: string, workerLvl: number): void {
+    private static spawnWorker(spawn: StructureSpawn, role: string, workerLvl: number, targetRoom?: string): void {
         const workerBody = this.getWorkerBody(workerLvl, spawn.room);
         const workerName = 'Worker_' + workerLvl + '_' + Game.time;
+        const room = targetRoom ?? spawn.room.name;
         
         console.log('Spawning new Worker: ' + workerName + ' (' + role + ')');
         
         spawn.spawnCreep(workerBody, workerName, { memory: {
             class: 'worker',
             role: role,
-            room: spawn.room.name,
+            room: room,
             working: false
         } });
     }

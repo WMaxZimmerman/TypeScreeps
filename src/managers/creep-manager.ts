@@ -6,6 +6,8 @@ export class CreepManager {
     private constructor() { }
 
     public static manage(creep: Creep): void {
+        if (!this.ensureCorrectRoom(creep)) return;
+        
         if (creep.memory.role == 'harvester') {
             var closestStruct = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                 filter: (structure: any) => {
@@ -26,7 +28,8 @@ export class CreepManager {
             this.upgrade(creep);
         }
         if (creep.memory.role == 'builder') {
-            if (creep.room.find(FIND_MY_CREEPS, { filter: (c) => { return c.memory.role == 'harvester' } }).length == 0) {
+            
+            if (creep.room.find(FIND_MY_CREEPS, { filter: (c) => { return c.memory.role == 'harvester' } }).length == 0 && creep.room.find(FIND_MY_SPAWNS).length > 0) {
                 this.harvest(creep);
             } else if (creep.room.find(FIND_CONSTRUCTION_SITES).length == 0) {
                 //    roleRepairman.run(creep);
@@ -57,21 +60,8 @@ export class CreepManager {
     }
 
     private static build(creep: Creep): void {
-        // var flag = Game.flags['Flag1'];
-        // targetRoom = flag.pos.roomName;
-        // console.log(JSON.stringify(targetRoom));
-        // if (targetRoom != undefined && targetRoom != null) {
-        //     if (creep.room.name != targetRoom) {
-        //         console.log(creep.room.name);
-        //         var flagPath = creep.pos.findPathTo(flag, {algorithm: 'astar'});
-        //         creep.moveTo(flag);
-        //         return;
-        //     }
-        // }
-
         if (creep.memory.class == undefined) creep.memory.class = 'worker';
-        //creep.moveTo(40, 24);
-        //return;
+        if (!creep.memory.isBuilding) creep.memory.isBuilding = false;
 
         if (creep.memory.isBuilding && creep.carry[RESOURCE_ENERGY] == 0) {
             creep.memory.isBuilding = false;
@@ -225,16 +215,16 @@ export class CreepManager {
         // }
 
         if (action == CreepAction.upgrade) {
-            console.log("upgrading");
+            //console.log("upgrading");
             actionCode = creep.upgradeController(target);
         } else if (action == CreepAction.harvest) {
-            console.log("harvesting");
+            //console.log("harvesting");
             actionCode = creep.harvest(target);
         } else if (action == CreepAction.transfer) {
-            console.log("transfering");
+            //console.log("transfering");
             actionCode = creep.transfer(target, RESOURCE_ENERGY);
         } else if (action == CreepAction.repair) {
-            console.log("repairing");
+            //console.log("repairing");
             actionCode = creep.repair(target);
         } else if (action == CreepAction.build) {
             console.log("building");
@@ -250,5 +240,27 @@ export class CreepManager {
                 creep.moveTo(target, { visualizePathStyle: { stroke: '#ffaa00' }, ignoreCreeps: true, ignoreRoads: true, swampCost: 1, plainCost: 1 });
             }
         }
+    }
+
+    public static ensureCorrectRoom(creep: Creep): boolean {
+        const targetRoom = creep.memory.room;
+        //console.log(JSON.stringify(targetRoom));
+        if (targetRoom != undefined && targetRoom != null) {
+            if (creep.room.name != targetRoom || (creep.room.name == targetRoom && this.borderPosition(creep))) {
+                console.log(creep.room.name);
+                const middleOfTargetRoom = new RoomPosition(24, 24, targetRoom);
+                creep.moveTo(middleOfTargetRoom, { reusePath: 100 });
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static borderPosition(creep: Creep): boolean {
+        return creep.pos.x == 0
+            || creep.pos.x == 49
+            || creep.pos.y == 0
+            || creep.pos.y == 49;
     }
 }

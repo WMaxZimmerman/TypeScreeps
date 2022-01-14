@@ -26,9 +26,23 @@ export class RoomManager {
         const controller = room.controller;
         if (controller != undefined) {
             if (controller.owner?.username == UserConstants.userName) {
-                room.find(FIND_MY_SPAWNS).map((spawn: StructureSpawn) => {
-                    SpawnManager.manage(spawn);
-                });
+                const spawns = room.find(FIND_MY_SPAWNS)
+
+                if (spawns.length == 0) {
+                    let creepCount = 0;
+                    for (const name in Game.creeps) {
+                        const creep = Game.creeps[name];
+                        if (creep.memory.room == room.name) creepCount++;
+                    }
+                    const spawnSite = room.find(FIND_CONSTRUCTION_SITES).filter(cs => cs.structureType == STRUCTURE_SPAWN);
+                    if (spawnSite.length > 0 && creepCount < 6) {
+                        Memory.kingdom.roomInNeedOfAide = room.name;
+                    }
+                } else {
+                    spawns.map((spawn: StructureSpawn) => {
+                        SpawnManager.manage(spawn);
+                    });
+                }
             }
         }
     }
@@ -47,3 +61,4 @@ export class RoomManager {
     }
     
 }
+

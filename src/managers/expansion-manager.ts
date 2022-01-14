@@ -9,14 +9,19 @@ export class ExpansionManager {
             Memory.kingdom.claimerNeeded = true;
         }
 
-        
-        console.log("================EXPANSION================");
+        const invaderFlag = Game.flags['Invade'];
+        if (invaderFlag) {
+            Memory.kingdom.invadersNeeded = invaderFlag.pos.roomName;
+            invaderFlag.remove();
+        }
+
+        //console.log("================EXPANSION================");
         for (const name in Game.creeps) {
             const creep = Game.creeps[name];
             if (creep.memory.class == "kingsown") {
-                console.log("================KINGSOWN================");
+                //console.log("================KINGSOWN================");
                 KingsownManager.manage(creep);
-                console.log("================KINGSOWN================");
+                //console.log("================KINGSOWN================");
             }
         }
     }
