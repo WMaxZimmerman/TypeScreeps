@@ -99,34 +99,8 @@ export class ConstructionManager {
                     let cs = sites[0];
                     cs.remove();
                     Memory.sites.splice(<any>index, 1);
-                    console.log('Removed unused road site.');
+                    //console.log('Removed unused road site.');
                 }
-            }
-        }
-    }
-
-    public static moveTowardTarget(creep: Creep, target: any, actionName: string): void {
-        //creep.say('move');
-        let actionCode;
-        if (actionName == 'upgrade') {
-            actionCode = creep.upgradeController(target);
-        } else if (actionName == 'harvest') {
-            actionCode = creep.harvest(target);
-        } else if (actionName == 'build') {
-            actionCode = creep.build(target);
-        } else if (actionName == 'transfer') {
-            actionCode = creep.transfer(target, RESOURCE_ENERGY);
-        } else if (actionName == 'repair') {
-            actionCode = creep.repair(target);
-        }
-
-        //creep.say(actionCode);
-        console.log(actionName + ': ' + actionCode);
-        //console.log(JSON.stringify(target));
-        if (target != null && actionCode == ERR_NOT_IN_RANGE) {
-            let moveCode = creep.moveTo(target, { visualizePathStyle: { stroke: '#ffaa00' }, ignoreRoads: true, swampCost: 1, plainCost: 1 });
-            if (moveCode == ERR_NO_PATH) {
-                creep.moveTo(target, { visualizePathStyle: { stroke: '#ffaa00' }, ignoreCreeps: true, ignoreRoads: true, swampCost: 1, plainCost: 1 });
             }
         }
     }

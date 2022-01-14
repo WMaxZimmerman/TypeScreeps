@@ -13,8 +13,7 @@ export class CreepManager {
                 filter: (structure: any) => {
                     return (structure.structureType == STRUCTURE_EXTENSION ||
                         structure.structureType == STRUCTURE_SPAWN ||
-                        structure.structureType == STRUCTURE_TOWER ||
-                        structure.structureType == STRUCTURE_CONTAINER) &&
+                        structure.structureType == STRUCTURE_TOWER) &&
                         (structure.energy < structure.energyCapacity);
                 }, algorithm: 'astar'
             });
@@ -53,9 +52,38 @@ export class CreepManager {
             }
         }
 
+        if (creep.memory.role == "miner") {
+            this.miner(creep);
+        }
+
         if (creep.memory.militaryRole && creep.memory.class != "kingsown")
         {
             SoldierManager.manage(creep);
+        }
+    }
+
+    private static miner(creep: Creep): void {
+        if (creep.memory.targetContainer) {
+            const container = Game.getObjectById(creep.memory.targetContainer);
+            if (container) {
+                if (container.hits < container.hitsMax) {
+                    if (container.ticksToDecay < 200) {
+                        creep.repair(container);
+                    }
+                }
+            }
+        }
+        
+        if (creep.memory.target && creep.pos.x != creep.memory.target.x && creep.pos.y != creep.memory.target.y && creep.pos.roomName != creep.memory.target.roomName) {
+            const pos = new RoomPosition(creep.memory.target.x, creep.memory.target.y, creep.memory.target.roomName);
+            creep.moveTo(pos);
+        } else {
+            if (creep.memory.targetSource) {
+                const source = Game.getObjectById(creep.memory.targetSource);
+                if (source){
+                    creep.harvest(source);
+                }
+            }
         }
     }
 
@@ -88,23 +116,40 @@ export class CreepManager {
                 this.moveTowardTarget(creep, prioritySite, CreepAction.build);
             }
         } else {
-            let source = creep.pos.findClosestByPath(FIND_SOURCES, {
+            this.getEnergy(creep);
+        }
+
+        //ConstructionManager.checkRoadConstruction(creep);
+    }
+
+    private static getEnergy(creep: Creep): void {
+        const container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+            filter: (s) => {
+                return s.structureType == "container" && s.store[RESOURCE_ENERGY] > 0;
+            }, algorithm: 'astar'
+        });
+
+        if (container) {
+            //console.log("=== I see container ===");
+            //console.log(JSON.stringify(container));
+            this.moveTowardTarget(creep, container, CreepAction.withdraw);
+            return;
+        }
+        
+        let source = creep.pos.findClosestByPath(FIND_SOURCES, {
+            filter: (s) => {
+                return s.energy > 0;
+            }, algorithm: 'astar'
+        });
+
+        if (source == null) {
+            source = creep.pos.findClosestByPath(FIND_SOURCES, {
                 filter: (s) => {
                     return s.energy > 0;
                 }, algorithm: 'astar'
             });
-
-            if (source == null) {
-                source = creep.pos.findClosestByPath(FIND_SOURCES, {
-                    filter: (s) => {
-                        return s.energy > 0;
-                    }, algorithm: 'astar'
-                });
-            }
-            this.moveTowardTarget(creep, source, CreepAction.harvest);
         }
-
-        ConstructionManager.checkRoadConstruction(creep);
+        this.moveTowardTarget(creep, source, CreepAction.harvest);
     }
 
     private static harvest(creep: Creep): void {
@@ -112,13 +157,7 @@ export class CreepManager {
         if (creep.memory.isHarvesting == undefined) creep.memory.isHarvesting = creep.carry.energy < creep.carryCapacity;
 
         if (creep.carry[RESOURCE_ENERGY] < creep.carryCapacity && creep.memory.isHarvesting == true) {
-            const source = creep.pos.findClosestByPath(FIND_SOURCES, {
-                filter: (s) => {
-                    return s.energy > 0;
-                }, algorithm: 'astar'
-            });
-
-            this.moveTowardTarget(creep, source, CreepAction.harvest);
+            this.getEnergy(creep);
         }
         else {
             if (creep.carry[RESOURCE_ENERGY] == creep.carryCapacity) creep.memory.isHarvesting = false;
@@ -127,8 +166,7 @@ export class CreepManager {
                 filter: (structure: any) => {
                     return (structure.structureType == STRUCTURE_EXTENSION ||
                         structure.structureType == STRUCTURE_SPAWN ||
-                        structure.structureType == STRUCTURE_TOWER ||
-                        structure.structureType == STRUCTURE_CONTAINER) &&
+                        structure.structureType == STRUCTURE_TOWER) &&
                         (structure.energy < structure.energyCapacity);
                 }, algorithm: 'astar'
             });
@@ -147,7 +185,7 @@ export class CreepManager {
             if (creep.carry.energy == 0) creep.memory.isHarvesting = true;
         }
 
-        ConstructionManager.checkRoadConstruction(creep);
+        //ConstructionManager.checkRoadConstruction(creep);
     }
 
     private static upgrade(creep: Creep): void {
@@ -167,53 +205,15 @@ export class CreepManager {
             this.moveTowardTarget(creep, controller, CreepAction.upgrade);
         }
         else {
-            // if (creep.memory.role == 'upgrader' && creep.room.name == Game.spawns['Spawn1'].room.name) {
-            //     var exitDir = Game.map.findExit('W27N38', 'W27N39');
-            //     var exit = creep.pos.findClosestByPath(exitDir, { algorithm: 'astar', ignoreRoads: true, swampCost: 1, plainCost: 1, ignoreCreeps: true });
-            //     creep.moveTo(exit, {visualizePathStyle: {stroke: '#ffaa00'}});
-            //} else {
-            var source = creep.pos.findClosestByPath(FIND_SOURCES, {
-                filter: (s) => {
-                    return s.energy > 0;
-                }, algorithm: 'astar'
-            });
-
-            if (source == null) {
-                source = creep.pos.findClosestByPath(FIND_SOURCES, {
-                    filter: (s) => {
-                        return s.energy > 0;
-                    }, algorithm: 'astar'
-                });
-            }
-            this.moveTowardTarget(creep, source, CreepAction.harvest);
-            //}
+            this.getEnergy(creep);
         }
 
-        ConstructionManager.checkRoadConstruction(creep);
+        //ConstructionManager.checkRoadConstruction(creep);
     }
 
     private static moveTowardTarget(creep: Creep, target: any, action: CreepAction) {
         //creep.say('move');
         let actionCode;
-        // switch (action) {
-        //     case CreepAction.upgrade: {
-        //         console.log("upgrading");
-        //         actionCode = creep.upgradeController(target);
-        //     }
-        //     case CreepAction.harvest: {
-        //         console.log("harvesting");
-        //         actionCode = creep.harvest(target);
-        //     }
-        //     case CreepAction.transfer: {
-        //         console.log("transfering");
-        //         actionCode = creep.transfer(target, RESOURCE_ENERGY);
-        //     }
-        //     case CreepAction.repair: {
-        //         console.log("repairing");
-        //         actionCode = creep.repair(target);
-        //     }
-        // }
-
         if (action == CreepAction.upgrade) {
             //console.log("upgrading");
             actionCode = creep.upgradeController(target);
@@ -227,13 +227,15 @@ export class CreepManager {
             //console.log("repairing");
             actionCode = creep.repair(target);
         } else if (action == CreepAction.build) {
-            console.log("building");
+            //console.log("building");
             actionCode = creep.build(target);
+        } else if (action == CreepAction.withdraw) {
+            actionCode = creep.withdraw(target, RESOURCE_ENERGY);
         }
 
         //creep.say(actionCode);
-        console.log("action '" + action + "' has status of '" + actionCode + "'");
-        console.log(JSON.stringify(target));
+        //console.log("action '" + action + "' has status of '" + actionCode + "'");
+        //console.log(JSON.stringify(target));
         if (target != null && actionCode == ERR_NOT_IN_RANGE) {
             let moveCode = creep.moveTo(target, { visualizePathStyle: { stroke: '#ffaa00' }, ignoreRoads: true, swampCost: 1, plainCost: 1 });
             if (moveCode == ERR_NO_PATH) {
@@ -247,7 +249,7 @@ export class CreepManager {
         //console.log(JSON.stringify(targetRoom));
         if (targetRoom != undefined && targetRoom != null) {
             if (creep.room.name != targetRoom || (creep.room.name == targetRoom && this.borderPosition(creep))) {
-                console.log(creep.room.name);
+                //console.log(creep.room.name);
                 const middleOfTargetRoom = new RoomPosition(24, 24, targetRoom);
                 creep.moveTo(middleOfTargetRoom, { reusePath: 100 });
                 return false;

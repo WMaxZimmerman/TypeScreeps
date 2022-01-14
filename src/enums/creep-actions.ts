@@ -7,5 +7,6 @@ export enum CreepAction {
     patrol,
     guard,
     claim,
-    invade
+    invade,
+    withdraw
 }

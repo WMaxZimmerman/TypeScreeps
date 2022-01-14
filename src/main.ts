@@ -1,6 +1,7 @@
 import { MilitaryRole } from "enums/military-roles";
 import { Kingdom } from "kingdom";
 import { KingdomMemory } from "models/kingdom";
+import { SourceMemory } from "models/source-memory";
 import { ErrorMapper } from "utils/ErrorMapper";
 
 declare global {
@@ -26,6 +27,7 @@ declare global {
         isInitialized: boolean;
         workerLvl: number;
         workerLimit: number;
+        sources: SourceMemory[];
     }
 
     interface CreepMemory {
@@ -38,6 +40,8 @@ declare global {
         isBuilding?: boolean;
         militaryRole?: MilitaryRole;
         target?: RoomPosition;
+        targetSource?: Id<Source>;
+        targetContainer?: Id<StructureContainer>;
     }
 
     // Syntax for adding proprties to `global` (ex "global.log")
@@ -51,5 +55,6 @@ declare global {
 // When compiling TS to JS and bundling with rollup, the line numbers and file names in error messages change
 // This utility uses source maps to get the line numbers and file names of the original, TS source code
 export const loop = ErrorMapper.wrapLoop(() => {
+    console.log(`==== Current game tick is ${Game.time} ====`);
     Kingdom.run();
 });

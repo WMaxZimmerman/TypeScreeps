@@ -29,15 +29,57 @@ export class SpawnManager {
         // if (workerLvl >= 4) workerBody = [WORK,CARRY,MOVE,WORK,CARRY,MOVE,WORK,CARRY,MOVE,WORK,CARRY,MOVE];
         // if (workerLvl >= 5) workerBody = [WORK,CARRY,MOVE,WORK,CARRY,MOVE,WORK,CARRY,MOVE,WORK,CARRY,MOVE,WORK,CARRY,MOVE];
 
+
+        
+        if (workerLvl >= 4) {
+            const sources = spawn.room.memory.sources;
+            if (sources) {
+                //console.log("=== found sources ===");
+                sources.forEach(s => {
+                    if (s.container) {
+                        //console.log("=== found a container ===");
+                        const container = Game.getObjectById(s.container);
+                        if (container) {
+                            //console.log("=== found a real container ===");
+                            if (s.minerRequest && !s.miner && spawn.room.energyAvailable >= 600) {
+                                //console.log("=== spawning a miner ===");
+                                const newName = 'Worker_Miner_' + Game.time;
+                                spawn.spawnCreep([MOVE, CARRY, WORK, WORK, WORK, WORK, WORK, WORK], newName,{memory: {
+                                    class: 'worker',
+                                    room: spawn.room.name,
+                                    working: false,
+                                    target: container.pos,
+                                    targetSource: s.id,
+                                    targetContainer: s.container,
+                                    role: 'miner'
+                                }});
+                                s.miner = newName;
+                            }
+                        }
+                    }
+                });
+            }            
+        }
+        
         if (harvesters.length < roleCap && spawn.room.energyAvailable >= workerCost) {
             this.spawnWorker(spawn, "harvester", workerLvl);
         } else if (upgraders.length < roleCap && spawn.room.energyAvailable >= workerCost) {
             this.spawnWorker(spawn, "upgrader", workerLvl);
         } else if (builders.length < roleCap && spawn.room.energyAvailable >= workerCost) {
             this.spawnWorker(spawn, "builder", workerLvl);
+        } else if (fighters.length < roleCap /2 &&  spawn.room.energyAvailable >= 300) {
+            const newName = 'Fighter_' + Game.time;
+            //console.log('Spawning new fighter: ' + newName);
+            spawn.spawnCreep([MOVE, MOVE, MOVE, RANGED_ATTACK], newName,{memory: {
+                class: 'fighter',
+                room: spawn.room.name,
+                working: false,
+                militaryRole: MilitaryRole.invader,
+                role: 'invader'
+            }});
         } else if(spawn.room.energyAvailable >= 800 && Memory.kingdom.claimerNeeded) { //&& harvesters.length > 3 && upgraders.length > 2 && builders.length > 2 && Game.gcl >= 3) {
             const newName = 'Kingsown_Claimer_' + Game.time;
-            console.log('Spawning new claimer: ' + newName);
+            //console.log('Spawning new claimer: ' + newName);
             Memory.kingdom.claimerNeeded = false;
             const claimFlag = Game.flags['Claim'];
             spawn.spawnCreep([MOVE, MOVE, MOVE, MOVE, CLAIM], newName, {
@@ -56,7 +98,7 @@ export class SpawnManager {
             Memory.kingdom.roomInNeedOfAide = undefined;
         } else if (Memory.kingdom.invadersNeeded && spawn.room.energyAvailable >= 300) {
             const newName = 'Fighter_' + Game.time;
-            console.log('Spawning new fighter: ' + newName);
+            //console.log('Spawning new fighter: ' + newName);
             spawn.spawnCreep([MOVE, MOVE, MOVE, RANGED_ATTACK], newName,{memory: {
                 class: 'kingsown',
                 room: Memory.kingdom.invadersNeeded,
@@ -78,7 +120,7 @@ export class SpawnManager {
         const workerName = 'Worker_' + workerLvl + '_' + Game.time;
         const room = targetRoom ?? spawn.room.name;
         
-        console.log('Spawning new Worker: ' + workerName + ' (' + role + ')');
+        //console.log('Spawning new Worker: ' + workerName + ' (' + role + ')');
         
         spawn.spawnCreep(workerBody, workerName, { memory: {
             class: 'worker',

@@ -13,23 +13,7 @@ export class Kingdom {
             Memory.kingdom = new KingdomMemory(false);
         }
         
-        console.log(`==== Current game tick is ${Game.time} ====`);
         MemoryManager.cleanMemory();
-        
-        //Temporary cleanup of roads
-        // for (var index in Game.constructionSites) {
-        //     var cs = Game.constructionSites[index];
-        //     if (cs != undefined && cs.room != undefined && cs.room.name != 'W25N38' || cs.pos.y < 9) {
-        //         cs.remove();
-        //     }
-        // }
-
-        // for (var index in Game.rooms['W27N38'].find(FIND_STRUCTURES)) {
-        //     var cs = Game.rooms['W27N38'].find(FIND_STRUCTURES)[index];
-        //     if (cs.structureType == 'road') {
-        //         cs.destroy();
-        //     }
-        // }
 
         EventManager.creepCountChanged();
         ExpansionManager.manage();

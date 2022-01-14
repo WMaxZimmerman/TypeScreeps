@@ -10,9 +10,9 @@ export class KingsownManager {
         if (!role) return;
 
         if (role == "claimer") {
-            console.log("================CLAIMER================");
+            //console.log("================CLAIMER================");
             this.claim(creep);
-            console.log("================CLAIMER================");
+            //console.log("================CLAIMER================");
         }
 
         const militaryRole = creep.memory.militaryRole;
@@ -64,7 +64,7 @@ export class KingsownManager {
             }
         } else {
             if (closestSpawn != null) {
-                console.log('attacking enemy spawn');
+                //console.log('attacking enemy spawn');
                 if (creep.rangedAttack(closestSpawn) == ERR_NOT_IN_RANGE) {
                     //creep.rangedAttack(closestSpawn);
                     //let closestWall = creep.pos.findClosestByPath(FIND_STRUCTURES, {filter: (struct) => struct.structureType == STRUCTURE_WALL});
@@ -74,7 +74,7 @@ export class KingsownManager {
                     creep.moveByPath(path);
                 }
             } else {
-                console.log('hunting enemy creeps');
+                //console.log('hunting enemy creeps');
                 const closestEnemy = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
 
                 if (closestEnemy != null) {
@@ -94,17 +94,17 @@ export class KingsownManager {
         if (!target) return;
 
         const targetRoomName = target.roomName;
-        console.log(JSON.stringify(targetRoomName));
+        //console.log(JSON.stringify(targetRoomName));
         if (targetRoomName != undefined && targetRoomName != null) {
             if (creep.room.name != targetRoomName || (creep.room.name == targetRoomName && this.borderPosition(creep))) {
-                console.log(creep.room.name);
+                //console.log(creep.room.name);
                 //const flagPath = creep.pos.findPathTo(target.x, target.y);
                 //const temp = creep.moveTo(target, { reusePath: 10});
                 //console.log(temp);
                 const temp1 = new RoomPosition(target.x, target.y, targetRoomName);
                 const temp3 = creep.moveTo(temp1, { reusePath: 10 });
 
-                console.log(temp3);
+                //console.log(temp3);
 
             } else {
                 const controller = creep.room.controller;

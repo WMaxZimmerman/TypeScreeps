@@ -8,11 +8,11 @@ export class EventManager {
 
         if (currentCreepCount != Memory.currentCreepCount) {
             Memory.currentCreepCount = currentCreepCount;
-            console.log('Current Creeps: ' + Memory.currentCreepCount + ' -------------------------------');
-            console.log('Harvesters: ' + _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester').length);
-            console.log('Upgraders: ' + _.filter(Game.creeps, (creep) => creep.memory.role == 'builder').length);
-            console.log('Builders: ' + _.filter(Game.creeps, (creep) => creep.memory.role == 'upgrader').length);
-            console.log('Fighters: ' + _.filter(Game.creeps, (creep) => creep.memory.role == 'fighter').length);
+            //console.log('Current Creeps: ' + Memory.currentCreepCount + ' -------------------------------');
+            //console.log('Harvesters: ' + _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester').length);
+            //console.log('Upgraders: ' + _.filter(Game.creeps, (creep) => creep.memory.role == 'builder').length);
+            //console.log('Builders: ' + _.filter(Game.creeps, (creep) => creep.memory.role == 'upgrader').length);
+            //console.log('Fighters: ' + _.filter(Game.creeps, (creep) => creep.memory.role == 'fighter').length);
         }
     }
 
@@ -21,7 +21,7 @@ export class EventManager {
         if (!controller) return;
         var currentExtensions = room.find(FIND_STRUCTURES, { filter: (s) => { return s.structureType == 'extension' } }).length;
         if (currentExtensions < (controller.level - 2) * 5) {
-            console.log('RCL Upgraded to lvl ' + controller.level);
+            //console.log('RCL Upgraded to lvl ' + controller.level);
             // room.find(FIND_FLAGS).forEach(function(flag) {
             //     // room.lookForAt(LOOK_CONSTRUCTION_SITES, flag.x,  flag.y).forEach(function(site){
             //     //     site.remove();

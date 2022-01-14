@@ -5,13 +5,23 @@ export class MemoryManager {
         this.cleanMissingCreeps();
         this.cleanMissingSites();
         this.cleanUselessRoads();
+        //this.cleanRoads();
+    }
+
+    private static cleanRoads(): void {
+        for (const index in Game.constructionSites) {
+            const cs = Game.constructionSites[index];
+            if (cs && cs.structureType == STRUCTURE_ROAD) {
+                cs.remove();
+            }
+        }
     }
 
     private static cleanMissingCreeps(): void {
         for (const name in Memory.creeps) {
             if (!(name in Game.creeps)) {
                 delete Memory.creeps[name];
-                console.log('Clearing non-existing creep memory:', name);
+                //console.log('Clearing non-existing creep memory:', name);
             }
         }
     }
@@ -23,10 +33,10 @@ export class MemoryManager {
             let siteRoom = Game.rooms[site.roomName];
             if (siteRoom == undefined) {
                 Memory.sites.splice(<any>index, 1);
-                console.log('Clearing constructionSite memory in non-found room.');
+                //console.log('Clearing constructionSite memory in non-found room.');
             } else if (siteRoom.lookForAt(LOOK_CONSTRUCTION_SITES, site.pos.x, site.pos.y).length == 0) {
                 Memory.sites.splice(<any>index, 1);
-                console.log('Clearing non-existing constructionSite memory.');
+                //console.log('Clearing non-existing constructionSite memory.');
             }
         }
     }
@@ -41,7 +51,7 @@ export class MemoryManager {
                     let cs = sites[0];
                     cs.remove();
                     Memory.sites.splice(<any>index, 1);
-                    console.log('Removed unused road site.');
+                    //console.log('Removed unused road site.');
                 }
             }
         }
