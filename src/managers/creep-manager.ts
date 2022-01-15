@@ -63,24 +63,33 @@ export class CreepManager {
     }
 
     private static miner(creep: Creep): void {
+        //console.log("=== im a miner ===");
         if (creep.memory.targetContainer) {
+            //console.log("=== found a container ===");
             const container = Game.getObjectById(creep.memory.targetContainer);
             if (container) {
+                //console.log("=== found a real container ===");
                 if (container.hits < container.hitsMax) {
+                    //console.log("=== it is hurt ===");
                     if (container.ticksToDecay < 200) {
+                        //console.log("=== gonna fix it ===");
                         creep.repair(container);
                     }
                 }
             }
         }
         
-        if (creep.memory.target && creep.pos.x != creep.memory.target.x && creep.pos.y != creep.memory.target.y && creep.pos.roomName != creep.memory.target.roomName) {
+        if (creep.memory.target && (creep.pos.x != creep.memory.target.x || creep.pos.y || creep.memory.target.y || creep.pos.roomName != creep.memory.target.roomName)) {
+            //console.log("=== im not on my post ===");
             const pos = new RoomPosition(creep.memory.target.x, creep.memory.target.y, creep.memory.target.roomName);
             creep.moveTo(pos);
         } else {
+            //console.log("=== I am on my post ===");
             if (creep.memory.targetSource) {
+                //console.log("=== gonna harvet ===");
                 const source = Game.getObjectById(creep.memory.targetSource);
                 if (source){
+                    //console.log("=== with this source i found ===");
                     creep.harvest(source);
                 }
             }
@@ -207,35 +216,24 @@ export class CreepManager {
         else {
             this.getEnergy(creep);
         }
-
-        //ConstructionManager.checkRoadConstruction(creep);
     }
 
     private static moveTowardTarget(creep: Creep, target: any, action: CreepAction) {
-        //creep.say('move');
         let actionCode;
         if (action == CreepAction.upgrade) {
-            //console.log("upgrading");
             actionCode = creep.upgradeController(target);
         } else if (action == CreepAction.harvest) {
-            //console.log("harvesting");
             actionCode = creep.harvest(target);
         } else if (action == CreepAction.transfer) {
-            //console.log("transfering");
             actionCode = creep.transfer(target, RESOURCE_ENERGY);
         } else if (action == CreepAction.repair) {
-            //console.log("repairing");
             actionCode = creep.repair(target);
         } else if (action == CreepAction.build) {
-            //console.log("building");
             actionCode = creep.build(target);
         } else if (action == CreepAction.withdraw) {
             actionCode = creep.withdraw(target, RESOURCE_ENERGY);
         }
-
-        //creep.say(actionCode);
-        //console.log("action '" + action + "' has status of '" + actionCode + "'");
-        //console.log(JSON.stringify(target));
+        
         if (target != null && actionCode == ERR_NOT_IN_RANGE) {
             let moveCode = creep.moveTo(target, { visualizePathStyle: { stroke: '#ffaa00' }, ignoreRoads: true, swampCost: 1, plainCost: 1 });
             if (moveCode == ERR_NO_PATH) {

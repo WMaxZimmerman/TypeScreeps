@@ -21,7 +21,8 @@ export class SpawnManager {
         const repairmen = _.filter(roomCreeps, (creep) => creep.memory.role == 'repairman');
         const fighters = _.filter(roomCreeps, (creep) => creep.memory.militaryRole);
         const roleCap = 2;
-        const workerLvl = spawn.room.memory.workerLvl;
+        const workerLvlCap = 3;
+        const workerLvl = spawn.room.memory.workerLvl > workerLvlCap ? workerLvlCap : spawn.room.memory.workerLvl;
         const workerCost = (200 * workerLvl);
         // var workerBody = [WORK,CARRY,MOVE];
         // if (workerLvl >= 2) workerBody = [WORK,CARRY,MOVE,WORK,CARRY,MOVE];
@@ -31,7 +32,7 @@ export class SpawnManager {
 
 
         
-        if (workerLvl >= 4) {
+        if (spawn.room.memory.workerLvl >= 4) {
             const sources = spawn.room.memory.sources;
             if (sources) {
                 //console.log("=== found sources ===");
@@ -41,7 +42,7 @@ export class SpawnManager {
                         const container = Game.getObjectById(s.container);
                         if (container) {
                             //console.log("=== found a real container ===");
-                            if (s.minerRequest && !s.miner && spawn.room.energyAvailable >= 600) {
+                            if (s.minerRequest && (!s.miner || !Game.creeps[s.miner]) && spawn.room.energyAvailable >= 600) {
                                 //console.log("=== spawning a miner ===");
                                 const newName = 'Worker_Miner_' + Game.time;
                                 spawn.spawnCreep([MOVE, CARRY, WORK, WORK, WORK, WORK, WORK, WORK], newName,{memory: {
@@ -133,7 +134,6 @@ export class SpawnManager {
     private static getWorkerBody(workerLvl: number, room: Room): BodyPartConstant[] {
         const capacity = room.energyCapacityAvailable;
         if (capacity < 200) return [];
-        //const lvl = capacity % 100;
         // let workerBody = [WORK, CARRY, CARRY, CARRY, MOVE];
         // if (workerLvl >= 2) workerBody = [WORK, CARRY, CARRY, CARRY, MOVE, WORK, CARRY, CARRY, MOVE];
         // if (workerLvl >= 3) workerBody = [WORK,CARRY,MOVE,WORK,CARRY,MOVE,WORK,CARRY,MOVE];
