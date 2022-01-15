@@ -22,57 +22,30 @@ export class CreepManager {
             } else {
                 this.harvest(creep);
             }
-        }
-        if (creep.memory.role == 'upgrader') {
+        } else if (creep.memory.role == 'upgrader') {
             this.upgrade(creep);
-        }
-        if (creep.memory.role == 'builder') {
+        } else if (creep.memory.role == 'builder') {
             
             if (creep.room.find(FIND_MY_CREEPS, { filter: (c) => { return c.memory.role == 'harvester' } }).length == 0 && creep.room.find(FIND_MY_SPAWNS).length > 0) {
                 this.harvest(creep);
             } else if (creep.room.find(FIND_CONSTRUCTION_SITES).length == 0) {
-                //    roleRepairman.run(creep);
-                //} else if (creep.room.find(FIND_STRUCTURES, { filter: (cs) =>  {
-                //    return ((cs.structureType == STRUCTURE_WALL || cs.structureType == STRUCTURE_RAMPART) && cs.hits < cs.hitsMax);
-                //}}).length == 0) {
                 this.upgrade(creep);
             } else {
                 this.build(creep);
             }
-        }
-        if (creep.memory.role == 'repairman') {
-            if (creep.room.energyAvailable == creep.room.energyCapacityAvailable) {
-                if (creep.room.find(FIND_CONSTRUCTION_SITES).length > 0) {
-                    this.build(creep);
-                } else {
-                    this.upgrade(creep);
-                }
-            } else {
-                this.harvest(creep);
-            }
-        }
-
-        if (creep.memory.role == "miner") {
+        } else if (creep.memory.role == "miner") {
             this.miner(creep);
-        }
-
-        if (creep.memory.militaryRole && creep.memory.class != "kingsown")
-        {
+        } else if (creep.memory.militaryRole && creep.memory.class != "kingsown") {
             SoldierManager.manage(creep);
         }
     }
 
     private static miner(creep: Creep): void {
-        //console.log("=== im a miner ===");
         if (creep.memory.targetContainer) {
-            //console.log("=== found a container ===");
             const container = Game.getObjectById(creep.memory.targetContainer);
             if (container) {
-                //console.log("=== found a real container ===");
                 if (container.hits < container.hitsMax) {
-                    //console.log("=== it is hurt ===");
                     if (container.ticksToDecay < 200) {
-                        //console.log("=== gonna fix it ===");
                         creep.repair(container);
                     }
                 }
@@ -80,16 +53,12 @@ export class CreepManager {
         }
         
         if (creep.memory.target && (creep.pos.x != creep.memory.target.x || creep.pos.y || creep.memory.target.y || creep.pos.roomName != creep.memory.target.roomName)) {
-            //console.log("=== im not on my post ===");
             const pos = new RoomPosition(creep.memory.target.x, creep.memory.target.y, creep.memory.target.roomName);
             creep.moveTo(pos);
         } else {
-            //console.log("=== I am on my post ===");
             if (creep.memory.targetSource) {
-                //console.log("=== gonna harvet ===");
                 const source = Game.getObjectById(creep.memory.targetSource);
                 if (source){
-                    //console.log("=== with this source i found ===");
                     creep.harvest(source);
                 }
             }
@@ -117,18 +86,14 @@ export class CreepManager {
             });
 
             if (closestNonRoadConstructionSite != undefined && closestNonRoadConstructionSite != null) {
-                //console.log('found not road');
                 this.moveTowardTarget(creep, closestNonRoadConstructionSite, CreepAction.build);
             } else {
-                //console.log(JSON.stringify(Memory.prioritySite));
                 let prioritySite = ConstructionManager.getPrioritySite(creep.room.name);
                 this.moveTowardTarget(creep, prioritySite, CreepAction.build);
             }
         } else {
             this.getEnergy(creep);
         }
-
-        //ConstructionManager.checkRoadConstruction(creep);
     }
 
     private static getEnergy(creep: Creep): void {
@@ -139,8 +104,6 @@ export class CreepManager {
         });
 
         if (container) {
-            //console.log("=== I see container ===");
-            //console.log(JSON.stringify(container));
             this.moveTowardTarget(creep, container, CreepAction.withdraw);
             return;
         }
@@ -193,8 +156,6 @@ export class CreepManager {
 
             if (creep.carry.energy == 0) creep.memory.isHarvesting = true;
         }
-
-        //ConstructionManager.checkRoadConstruction(creep);
     }
 
     private static upgrade(creep: Creep): void {
@@ -244,10 +205,8 @@ export class CreepManager {
 
     public static ensureCorrectRoom(creep: Creep): boolean {
         const targetRoom = creep.memory.room;
-        //console.log(JSON.stringify(targetRoom));
         if (targetRoom != undefined && targetRoom != null) {
             if (creep.room.name != targetRoom || (creep.room.name == targetRoom && this.borderPosition(creep))) {
-                //console.log(creep.room.name);
                 const middleOfTargetRoom = new RoomPosition(24, 24, targetRoom);
                 creep.moveTo(middleOfTargetRoom, { reusePath: 100 });
                 return false;
