@@ -42,27 +42,47 @@ export class CreepManager {
 
     private static miner(creep: Creep): void {
         if (creep.memory.targetContainer) {
+            console.log("1");
             const container = Game.getObjectById(creep.memory.targetContainer);
             if (container) {
+                console.log("2")
                 if (container.hits < container.hitsMax) {
+                    console.log("3")
                     if (container.ticksToDecay < 200) {
+                        console.log("4")
                         creep.repair(container);
                     }
                 }
             }
         }
-        
-        if (creep.memory.target && (creep.pos.x != creep.memory.target.x || creep.pos.y || creep.memory.target.y || creep.pos.roomName != creep.memory.target.roomName)) {
-            const pos = new RoomPosition(creep.memory.target.x, creep.memory.target.y, creep.memory.target.roomName);
+
+        const tPos = creep.memory.target;
+        if (tPos && this.isOnPos(creep, tPos) == false) {
+            console.log("5")
+            const pos = new RoomPosition(tPos.x, tPos.y, tPos.roomName);
             creep.moveTo(pos);
         } else {
+            console.log("6")
             if (creep.memory.targetSource) {
+                console.log("7")
                 const source = Game.getObjectById(creep.memory.targetSource);
                 if (source){
+                    console.log("8")
                     creep.harvest(source);
                 }
             }
         }
+    }
+
+    public static creepExists(name: string): boolean {
+        const creep =  Game.creeps[name];
+        return creep != null && creep != undefined;
+    }
+
+    private static isOnPos(creep: Creep, pos: RoomPosition) {        
+        return creep.pos.x == pos.x
+            && creep.pos.y == pos.y
+            && creep.pos.roomName == pos.roomName;
     }
 
     private static build(creep: Creep): void {
@@ -156,6 +176,8 @@ export class CreepManager {
 
             if (creep.carry.energy == 0) creep.memory.isHarvesting = true;
         }
+
+        ConstructionManager.checkRoadConstruction(creep);
     }
 
     private static upgrade(creep: Creep): void {
@@ -177,6 +199,8 @@ export class CreepManager {
         else {
             this.getEnergy(creep);
         }
+
+        ConstructionManager.checkRoadConstruction(creep);
     }
 
     private static moveTowardTarget(creep: Creep, target: any, action: CreepAction) {

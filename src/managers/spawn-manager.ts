@@ -1,4 +1,5 @@
 import { MilitaryRole } from "enums/military-roles";
+import { CreepManager } from "./creep-manager";
 
 export class SpawnManager {
     private constructor() { }
@@ -35,15 +36,15 @@ export class SpawnManager {
         if (spawn.room.memory.workerLvl >= 4) {
             const sources = spawn.room.memory.sources;
             if (sources) {
-                //console.log("=== found sources ===");
+                console.log("=== found sources ===");
                 sources.forEach(s => {
                     if (s.container) {
-                        //console.log("=== found a container ===");
+                        console.log("=== found a container ===");
                         const container = Game.getObjectById(s.container);
                         if (container) {
-                            //console.log("=== found a real container ===");
-                            if (s.minerRequest && (!s.miner || !Game.creeps[s.miner]) && spawn.room.energyAvailable >= 600) {
-                                //console.log("=== spawning a miner ===");
+                            console.log("=== found a real container ===");
+                            if (s.minerRequest && (!s.miner || !CreepManager.creepExists(s.miner)) && spawn.room.energyAvailable >= 600) {
+                                console.log("=== spawning a miner ===");
                                 const newName = 'Worker_Miner_' + Game.time;
                                 spawn.spawnCreep([MOVE, CARRY, WORK, WORK, WORK, WORK, WORK, WORK], newName,{memory: {
                                     class: 'worker',
