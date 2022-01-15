@@ -22,8 +22,7 @@ export class SpawnManager {
         const repairmen = _.filter(roomCreeps, (creep) => creep.memory.role == 'repairman');
         const fighters = _.filter(roomCreeps, (creep) => creep.memory.militaryRole);
         const roleCap = 2;
-        const workerLvlCap = 3;
-        const workerLvl = spawn.room.memory.workerLvl > workerLvlCap ? workerLvlCap : spawn.room.memory.workerLvl;
+        const workerLvl = spawn.room.memory.workerLvl;
         const workerCost = (200 * workerLvl);
         // var workerBody = [WORK,CARRY,MOVE];
         // if (workerLvl >= 2) workerBody = [WORK,CARRY,MOVE,WORK,CARRY,MOVE];
