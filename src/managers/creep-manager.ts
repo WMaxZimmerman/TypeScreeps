@@ -196,9 +196,9 @@ export class CreepManager {
         }
         
         if (target != null && actionCode == ERR_NOT_IN_RANGE) {
-            let moveCode = creep.moveTo(target, { ignoreRoads: false, swampCost: 2, plainCost: 1 });
+            let moveCode = creep.moveTo(target, { ignoreRoads: false, swampCost: 2, plainCost: 1, reusePath: 100 });
             if (moveCode == ERR_NO_PATH) {
-                creep.moveTo(target, { ignoreCreeps: true, ignoreRoads: false, swampCost: 2, plainCost: 1 });
+                creep.moveTo(target, { ignoreCreeps: true, ignoreRoads: false, swampCost: 2, plainCost: 1, reusePath: 100 });
             }
         }
     }
