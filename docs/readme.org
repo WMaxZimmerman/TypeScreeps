@@ -78,6 +78,8 @@
 *** Scout
     - RoomsExplored
 
+*** Laborer
+
 ** Requests
 *** SpawnRequest
     - Class
@@ -141,6 +143,10 @@
 ** Region
    - Clean up region memory
    - Check Requests
+     - if Requests surpass capability, forward requests to Region
+       - Region Doesn't container viable villages
+         - Villages that are just starting out, or have no spawns
+       - Region has too many requests
      - Aide Request
        - Find Nearest Villages
          - Issue Aid Decree to the desired outpost/village
@@ -166,6 +172,9 @@
 ** Village
    - Clean up village memory
    - Check Requests
+     - if Requests surpass capability, forward requests to Region
+       - Village has no spawner
+       - Village has too many requests
      - Spawn Requests
        - Verify energy requirement met
          - Find idle spawner
@@ -182,6 +191,9 @@
      - If not, generate blueprint
      - Execute Blueprint
    - Iterate Over Sources
+   - Check For Construction Sites
+     - If any and "Laborers assigned to room and/or requested" < 3
+       - Issues Spawn Request to make up the difference in Laborers
 
 ** Outpost
    - Clean up outpost memory
@@ -189,6 +201,9 @@
      - If not, generate blueprint
      - Execute Blueprint
    - Iterate Over Sources
+   - Check For Construction Sites
+     - If any and "Laborers assigned to room and/or requested" < 3
+       - Issues Spawn Request to make up the difference in Laborers
 
 ** Source
    - Clean up Source memory
@@ -200,4 +215,5 @@
      - ensure the structure/construction site exits
        - if not, request construction site
 *** Generation
-    determine the ideal location for all structures/roads and store that information in memory.
+    determine the ideal location for all structures/roads and store that information in memory. Based on available
+    resources, determine the villageScore.
