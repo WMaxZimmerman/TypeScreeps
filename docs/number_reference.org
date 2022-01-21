@@ -1,0 +1,2 @@
+* Spawning
+  - Ticks to Spawn :: 3 ticks per body part
